@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity(name = "jforum_users")
-public class User {
+public class ForumUser {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,15 +29,6 @@ public class User {
 	@Column(name = "fb_access_token")
 	private String fbAccessToken;
 
-	@Column(name = "fb_refresh_token")
-	private String fbRefreshToken;
-	
-	@Column(name = "fb_token_expire")
-	private Long fbTokenExpire;
-	  
-	@Column(name = "logging")
-	private String logging;
-	
 	public Integer getId() {
 		return id;
 	}
@@ -84,30 +75,6 @@ public class User {
 
 	public void setFbAccessToken(String fbAccessToken) {
 		this.fbAccessToken = fbAccessToken;
-	}
-
-	public String getFbRefreshToken() {
-		return fbRefreshToken;
-	}
-
-	public void setFbRefreshToken(String fbRefreshToken) {
-		this.fbRefreshToken = fbRefreshToken;
-	}
-
-	public Long getFbTokenExpire() {
-		return fbTokenExpire;
-	}
-
-	public void setFbTokenExpire(Long fbTokenExpire) {
-		this.fbTokenExpire = fbTokenExpire;
-	}
-
-	public String getLogging() {
-		return logging;
-	}
-
-	public void setLogging(String logging) {
-		this.logging = logging;
 	}
 
 }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.xhumanity.social.model.User;
+import com.xhumanity.social.model.ForumUser;
 import com.xhumanity.social.repository.UserRepository;
 
 @Controller
@@ -17,7 +17,7 @@ public class UserController {
 	private UserRepository userRepository;
 
 	@GetMapping(path = "/all")
-	public @ResponseBody Iterable<User> getAllUsers() {
+	public @ResponseBody Iterable<ForumUser> getAllUsers() {
 		return userRepository.findAll();
 	}
 }

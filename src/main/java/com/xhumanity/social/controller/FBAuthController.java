@@ -24,8 +24,8 @@ public class FBAuthController {
 	}
 	
 	@GetMapping("/facebook")
-	public void createFacebookAccessToken(@RequestParam("code") String code) throws URISyntaxException, IOException {
-	    facebookService.createFacebookAccessToken(code);
+	public void createFacebookAccessToken(@RequestParam("code") String code, @RequestParam("username") String username) throws URISyntaxException, IOException {
+	    facebookService.createFacebookAccessToken(code, username);
 	}
 	
 	@GetMapping("/getName")
