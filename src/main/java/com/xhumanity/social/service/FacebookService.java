@@ -19,10 +19,10 @@ import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.xhumanity.social.model.FeedDTO;
-import com.xhumanity.social.model.ForumUser;
-import com.xhumanity.social.model.PostDTO;
-import com.xhumanity.social.repository.UserRepository;
+import com.xhumanity.social.dto.facebook.FeedDTO;
+import com.xhumanity.social.dto.facebook.PostDTO;
+import com.xhumanity.social.model.TelegramUser;
+import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.utils.FacebookUtils;
 
 @Service
@@ -34,7 +34,7 @@ public class FacebookService {
 	String facebookSecret;
 
 	@Autowired
-	private UserRepository userRepository;
+	private TelegramUserRepository telegramUserRepository;
 
 	private String accessToken;
 
@@ -53,10 +53,10 @@ public class FacebookService {
 				"https://localhost:8443/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
-		Optional<ForumUser> forumUser = userRepository.findByUsername(username);
-		forumUser.ifPresent(u -> {
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
+		telegramUser.ifPresent(u -> {
 			u.setFbAccessToken(accessToken);
-			userRepository.save(u);
+			telegramUserRepository.save(u);
 		});
 
 	}
@@ -88,8 +88,8 @@ public class FacebookService {
 	}
 
 	public String getPosts(Model model, String username) {
-		Optional<ForumUser> forumUser = userRepository.findByUsername(username);
-		forumUser.ifPresent(u -> {
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
+		telegramUser.ifPresent(u -> {
 			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
 
 			User userProfile = facebook.fetchObject(FacebookUtils.LOGGED_USER_ID, User.class,
@@ -103,9 +103,9 @@ public class FacebookService {
 	}
 
 	public FeedDTO getFeed(Model model, String username) {
-		Optional<ForumUser> forumUser = userRepository.findByUsername(username);
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
 		FeedDTO feed = new FeedDTO();
-		forumUser.ifPresent(u -> {
+		telegramUser.ifPresent(u -> {
 			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
 
 			User userProfile = facebook.fetchObject(FacebookUtils.LOGGED_USER_ID, User.class,

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.xhumanity.social.model.FeedDTO;
+import com.xhumanity.social.dto.facebook.FeedDTO;
 import com.xhumanity.social.service.FacebookService;
 
 @Controller

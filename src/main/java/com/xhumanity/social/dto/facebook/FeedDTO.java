@@ -1,4 +1,4 @@
-package com.xhumanity.social.model;
+package com.xhumanity.social.dto.facebook;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.xhumanity.social.model;
+package com.xhumanity.social.dto.facebook;
 
 public class PostDTO {
 	private String id;
