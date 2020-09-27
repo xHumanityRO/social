@@ -1,8 +1,3 @@
-# CREATE DATABASE forum;
-# CREATE USER 'forum'@'localhost' IDENTIFIED BY 'jpS8qBr5!y0';
-# GRANT ALL PRIVILEGES ON * . * TO 'forum'@'localhost';
-# FLUSH PRIVILEGES;
-
 DROP TABLE IF EXISTS telegram_users;
 CREATE TABLE telegram_users (
   id INT NOT NULL AUTO_INCREMENT,
