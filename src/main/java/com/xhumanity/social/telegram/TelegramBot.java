@@ -131,23 +131,27 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void createForumAccount(Update update, TelegramUser telegramUser, long chatId, String messageText) {
-		String password = generatePassword();
-
 		String answer = "Account created.";
-
-		try {
-			UserDTO user = createForumUser(telegramUser, password, chatId);
-			telegramUser.setForumUserId(user.getUserId());
-			telegramUserRepository.save(telegramUser);
-			answer += " Username: " + telegramUser.getForumUsername() + ", Pass: " + password + "\n"
-					+ "To log in please go to https://forum.xhumanity.org/register/login\n\n"
-					+ "Now you can send us links to your promotional videos. Just post the link here and we'll do the rest for you...\n\n"
-					+ "For a better experience within our comunity /share_phone_number with us";
-		} catch (Exception e) {
-			logger.error(e);
-			answer = e.getMessage();
+		
+		if (Utils.isEmailValid(telegramUser.getForumEmail())) {
+			String password = generatePassword();
+	
+			try {
+				UserDTO user = createForumUser(telegramUser, password, chatId);
+				telegramUser.setForumUserId(user.getUserId());
+				telegramUserRepository.save(telegramUser);
+				answer += " Username: " + telegramUser.getForumUsername() + ", Pass: " + password + "\n"
+						+ "To log in please go to https://forum.xhumanity.org/register/login\n\n"
+						+ "Now you can send us links to your promotional videos. Just post the link here and we'll do the rest for you...\n\n"
+						+ "For a better experience within our comunity /share_phone_number with us";
+			} catch (Exception e) {
+				logger.error(e);
+				answer = "Error occurred while creating your forum account. Please try again later.";
+			}
+		} else {
+			answer = "You first need to send us a valid email address (will be used in case you want to reset the password)\n" +
+					"Please enter your email address.";
 		}
-
 		SendMessage msg = new SendMessage().setChatId(chatId).setText(answer);
 		try {
 			execute(msg);
@@ -245,8 +249,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 		final StringBuffer answer = new StringBuffer(
 				"Your clip has been taken into account. You can visit our forum to check its status:");
 		if (telegramUser.getForumUserId() == null) {
+			String command = "/share_email_address";
+			if (Utils.isEmailValid(telegramUser.getForumEmail())) {
+				command = "/forum_sign_up";
+			}
 			Utils.replace(answer,
-					"We cannot take into account your link. You first need to create an account on our forum /forum_sign_up");
+					"We cannot take into account your link. You first need to create an account on our forum " + command);
 		} else {
 			String videoId = YoutubeUtils.getVideoIdFromYoutubeUrl(videoUrl);
 			logger.info("videoId = " + videoId);
