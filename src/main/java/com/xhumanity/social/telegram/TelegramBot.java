@@ -41,7 +41,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private static final String BOT_NAME = "xHumanityBotTest";
 	private static final int YOUTUBE_CAMPAIGN_ID = 827617;
-	private static final int PROMO_TOPIC_ID = 11096548;
+	private static final int PROMO_TOPIC_ID = 11100297;
 	private static final String USERNAME_PREFIX = "xH";
 	private static final String EMAIL_DOMAIN = "xhumanity.org";
 
@@ -261,9 +261,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 
 			try {
-				String topicLink = createTopic(telegramUser, videoUrl, forumApiKey);
-				answer.append(" ").append(topicLink);
-				logger.info(topicLink);
+				String postLink = createPost(telegramUser, videoUrl, forumApiKey);
+				answer.append(" ").append(postLink);
+				logger.info(postLink);
 			} catch (Exception e) {
 				logger.error(e);
 				Utils.replace(answer, "Error occurred while processing your link");
