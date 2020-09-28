@@ -42,9 +42,6 @@ public class TelegramUser {
 	@Column(name = "last_name")
 	private String lastName;
 
-	@Column(name = "user_email")
-	private String email;
-	
 	@Column(name = "user_password")
 	private String password;
 	

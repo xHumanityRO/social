@@ -5,7 +5,6 @@ CREATE TABLE telegram_users (
   chat_id BIGINT NOT NULL DEFAULT 0,
   username VARCHAR(50) DEFAULT '',
   user_password VARCHAR(128) DEFAULT '',
-  user_email VARCHAR(50) DEFAULT '',
   first_name VARCHAR(50) DEFAULT '',
   last_name VARCHAR(50) DEFAULT '',
   phone_number VARCHAR(20) DEFAULT '',

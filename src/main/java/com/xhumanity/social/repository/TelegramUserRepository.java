@@ -17,6 +17,6 @@ public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long
 	@Query("SELECT u FROM TelegramUser u WHERE u.chatId = :chatId AND u.forumUserId is not null")
 	Optional<TelegramUser> findByChatIdAndForumuserIdNotNull(@Param("chatId") long chatId);
 	
-	Optional<TelegramUser> findByEmail(@Param("email") String email);
+	Optional<TelegramUser> findByForumEmail(@Param("forumEmail") String forumEmail);
 }
 
