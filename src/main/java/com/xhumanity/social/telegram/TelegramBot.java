@@ -254,7 +254,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 				command = "/forum_sign_up";
 			}
 			Utils.replace(answer,
-					"We cannot take into account your link. You first need to create an account on our forum " + command);
+					"We cannot take into account your link. You first need to create an account on our forum. Start with " + command);
 		} else {
 			String videoId = YoutubeUtils.getVideoIdFromYoutubeUrl(videoUrl);
 			logger.info("videoId = " + videoId);
