@@ -30,6 +30,7 @@ import com.xhumanity.social.dto.forum.PostDTO;
 import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.dto.forum.UserDTO;
 import com.xhumanity.social.exception.APIException;
+import com.xhumanity.social.exception.IntegrationException;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.utils.ForumUtils;
@@ -84,12 +85,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 					processEmailAddress(update, telegramUser, chatId, messageText);
 				} else {
 					// Unknown command
-					String answer = "I'm instructed to only respond to following commands:\n" +
+					String answer = "I can only respond to the following commands:\n" +
 							"/start\n" +
 							"/share_email_address\n" +
 							"/forum_sign_up\n" +
 							"/share_phone_number\n\n" +
-							"And if you copy here a valid youtube link I will post it on your behalf on the forum.";
+							"And if you copy here a valid YouTube link, I will post it on your behalf on the forum.";
 					SendMessage message = new SendMessage().setChatId(chatId).setText(answer);
 					try {
 						execute(message);
@@ -115,8 +116,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void processStart(Update update, long chatId, String messageText) {
-		String answer = "Hi, xHumanicus! I can’t do much just yet, but soon I will gain new skills. To register on our forum, a valid email address is mandatory. Please click /share_email_address (will be used in case you want to reset the password).\n"
-				+ "By cicking on it you agree with our Terms and Conditions below.\n\n"
+		String answer = "Hi, xHumanicus! I can’t do much just yet, but soon I will gain new skills. In order to register on our forum you need to enter a valid email address. To do so, please click /share_email_address (this will be used in case you wanted to reset the password)..\n"
+				+ "By clicking on it you agree with our Terms and Conditions below.\n\n"
 				+ "While the administrators and moderators of this forum will attempt to remove or edit any generally objectionable material as quickly as possible, it is impossible to review every message. Therefore you acknowledge that all posts made to these forums this forum express the views and opinions of the authors and not the administrators, moderators or webmaster (except for posts made by these people) and hence will not be held liable.\n\n"
 				+ "You agree not to post any abusive, obscene, vulgar, slanderous, hateful, threatening, sexually-oriented or any other material that may violate any applicable laws. Doing so may lead to you being immediately and permanently banned (and your service provider being informed). The IP address of all posts is recorded to aid in the enforcement of these conditions. You agree that the webmaster, administrators and moderators of this forum have the right to remove, edit, move or close any topic at any time they see fit. As a user you agree to any information you have entered above being stored in a database. While this information will not be disclosed to any third party without your consent the webmaster, administrators and moderators cannot be held responsible for any hacking attempt that may lead to the data being compromised.\n\n"
 				+ "This forum system uses cookies to store information on your local computer. These cookies do not contain any of the information you have entered above; they serve only to improve your viewing pleasure. The e-mail address is used only for confirmation of your registration details and password (and for sending new passwords, should you forget your current one).\n\n"
@@ -144,12 +145,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 						+ "To log in please go to https://forum.xhumanity.org/register/login\n\n"
 						+ "Now you can send us links to your promotional videos. Just post the link here and we'll do the rest for you...\n\n"
 						+ "For a better experience within our comunity /share_phone_number with us";
+			} catch (IntegrationException e) {
+				answer = e.getMessage();
 			} catch (Exception e) {
 				logger.error(e);
 				answer = "Error occurred while creating your forum account. Please try again later.";
 			}
 		} else {
-			answer = "You first need to send us a valid email address (will be used in case you want to reset the password)\n" +
+			answer = "You first need to send us a valid email address (this will be used in case you want to reset your password).\n" +
 					"Please enter your email address.";
 		}
 		SendMessage msg = new SendMessage().setChatId(chatId).setText(answer);
@@ -173,7 +176,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			Optional<TelegramUser> searchedUser = telegramUserRepository.findByChatIdAndForumuserIdNotNull(chatId);
 
 			if (searchedUser.isPresent()) {
-				throw new APIException(
+				throw new IntegrationException(
 						"You already created an account with username: " + searchedUser.get().getForumUsername());
 			}
 
@@ -254,7 +257,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 				command = "/forum_sign_up";
 			}
 			Utils.replace(answer,
-					"We cannot take into account your link. You first need to create an account on our forum. Start with " + command);
+					"Sorry, we cannot take your link into account. You first need to create an account on our forum " + command);
 		} else {
 			String videoId = YoutubeUtils.getVideoIdFromYoutubeUrl(videoUrl);
 			logger.info("videoId = " + videoId);
@@ -314,11 +317,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void processEmailAddress(Update update, TelegramUser telegramUser, long chatId, String email) {
-		String answer = "Your e-mail address will be linked to your forum account.\n"
+		String answer = "Your email address will be linked to your forum account.\n"
 				+ "To create an account click on /forum_sign_up";
 		Optional<TelegramUser> existingUser = telegramUserRepository.findByForumEmail(email);
 		if (existingUser.isPresent() && !existingUser.get().getId().equals(telegramUser.getId())) {
-			answer = "This email address is already registered by another user. Please try with another one.";
+			answer = "This email address is already registered by another user. Please use another email address.";
 		} else {
 			logger.info("registering email address = " + email);
 			telegramUser.setForumEmail(email);
