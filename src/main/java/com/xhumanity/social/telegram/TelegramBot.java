@@ -118,7 +118,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private void processStart(Update update, long chatId, String messageText) {
 		String answer = "Hi, xHumanicus! I can’t do much just yet, but soon I will gain new skills. In order to register on our forum you need to enter a valid email address. To do so, please click /share_email_address (this will be used in case you wanted to reset the password)..\n"
-				+ "By clicking on it you agree with our Terms and Conditions http://webapp.xhumanity.org:8080/privacy/forum_t_c.html\n\n"
+				+ "By clicking on it you agree with our Terms and Conditions http://webapp.xhumanity.org/privacy/forum_t_c.html\n\n"
 				+ "/share_email_address";
 		SendMessage message = new SendMessage().setChatId(chatId).setText(answer).setParseMode(ParseMode.HTML);
 		try {
