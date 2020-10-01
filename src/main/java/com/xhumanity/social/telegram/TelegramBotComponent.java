@@ -13,12 +13,15 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
 import com.xhumanity.social.repository.TelegramUserRepository;
+import com.xhumanity.social.service.VideoRegistrationService;
 
 @Component
 public class TelegramBotComponent {
 
 	private static final Logger logger = LogManager.getLogger(TelegramBotComponent.class);
 
+	@Autowired
+	private VideoRegistrationService videoRegistrationService;
 	@Autowired
 	private TelegramUserRepository telegramUserRepository;
 
@@ -47,7 +50,7 @@ public class TelegramBotComponent {
 				try {
 					Thread.sleep(5000);
 					ApiContextInitializer.init();
-					botSession = botsApi.registerBot(new TelegramBot(telegramUserRepository, telegramToken, forumApiKey, youtubeApiKey));
+					botSession = botsApi.registerBot(new TelegramBot(videoRegistrationService, telegramUserRepository, telegramToken, forumApiKey, youtubeApiKey));
 				} catch (TelegramApiException | InterruptedException e) {
 					e.printStackTrace();
 				}

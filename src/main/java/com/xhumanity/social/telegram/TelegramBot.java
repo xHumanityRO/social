@@ -26,13 +26,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.xhumanity.social.dto.forum.PostDTO;
 import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.dto.forum.UserDTO;
-import com.xhumanity.social.exception.APIException;
 import com.xhumanity.social.exception.IntegrationException;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.TelegramUserRepository;
+import com.xhumanity.social.service.VideoRegistrationService;
 import com.xhumanity.social.utils.ForumUtils;
 import com.xhumanity.social.utils.Utils;
 import com.xhumanity.social.youtube.YoutubeUtils;
@@ -42,10 +41,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private static final String BOT_NAME = "xHumanityBotTest";
 	private static final int YOUTUBE_CAMPAIGN_ID = 827617;
-	private static final int PROMO_TOPIC_ID = 11100297;
 	private static final String USERNAME_PREFIX = "H";
 
+	private VideoRegistrationService videoRegistrationService;
 	private TelegramUserRepository telegramUserRepository;
+	
 
 	private String telegramToken;
 
@@ -53,7 +53,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private String youtubeApiKey;
 
-	public TelegramBot(TelegramUserRepository telegramUserRepository, String telegramToken, String forumApiKey, String youtubeApiKey) {
+	public TelegramBot(VideoRegistrationService videoRegistrationService, TelegramUserRepository telegramUserRepository, String telegramToken, String forumApiKey, String youtubeApiKey) {
+		this.videoRegistrationService = videoRegistrationService;
 		this.telegramUserRepository = telegramUserRepository;
 		this.telegramToken = telegramToken;
 		this.forumApiKey = forumApiKey;
@@ -89,7 +90,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 							"/start\n" +
 							"/share_email_address\n" +
 							"/forum_sign_up\n" +
-							"/share_phone_number\n\n" +
+							"/share_phone_number (optional)\n\n" +
 							"And if you copy here a valid YouTube link, I will post it on your behalf on the forum.";
 					SendMessage message = new SendMessage().setChatId(chatId).setText(answer);
 					try {
@@ -269,7 +270,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 
 			try {
-				String postLink = createPost(telegramUser, videoUrl, forumApiKey);
+				String postLink = videoRegistrationService.register(telegramUser, videoUrl, forumApiKey);
 				answer.append(" ").append(postLink);
 				logger.info(postLink);
 			} catch (Exception e) {
@@ -299,21 +300,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 			logger.error(e);
 		}
 		return topicLink;
-	}
-
-	public String createPost(TelegramUser user, String url, String forumApiKey) throws Exception {
-		int topicId = PROMO_TOPIC_ID;
-		final String subject = user.getFirstName() + "'s promotional video";
-		final String message = "This is my video. Waiting for your reaction...\\n" + url;
-
-		String postLink = "Error creating automated post";
-		try {
-			PostDTO post = ForumUtils.createPost(user.getForumUsername(), topicId, subject, message, forumApiKey);
-			postLink = post.getURL();
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		return postLink;
 	}
 
 	private void processEmailAddress(Update update, TelegramUser telegramUser, long chatId, String email) {

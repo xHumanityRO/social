@@ -16,3 +16,15 @@ CREATE TABLE telegram_users (
   fb_access_token VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS campaign_video;
+CREATE TABLE campaign_video (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL DEFAULT 0,
+  campaign_id INT NOT NULL DEFAULT 0,
+  source VARCHAR(50) DEFAULT '',
+  link VARCHAR(500) DEFAULT '',
+  entity_id VARCHAR(50) DEFAULT '',
+  post_url VARCHAR(500) DEFAULT '',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;

@@ -42,7 +42,7 @@ public class FacebookService {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 		OAuth2Parameters params = new OAuth2Parameters();
-		params.setRedirectUri("https://localhost:8443/social/facebook");
+		params.setRedirectUri("https://webapp.xhumanity.org:8443/social/facebook");
 		params.setScope("public_profile,email,user_birthday,user_posts");
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
@@ -50,7 +50,7 @@ public class FacebookService {
 	public void createFacebookAccessToken(String code, String username) throws URISyntaxException, IOException {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code,
-				"https://localhost:8443/social/facebook", null);
+				"https://webapp.xhumanity.org:8443/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
