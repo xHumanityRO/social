@@ -91,7 +91,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 							"/share_email_address\n" +
 							"/forum_sign_up\n" +
 							"/share_phone_number (optional)\n\n" +
-							"And if you copy here a valid YouTube link, I will post it on your behalf on the forum.";
+							"And if you copy here a valid YouTube link, I will post it on your behalf on the forum. Don’t post the link directly on the forum, let me do the work for you.";
 					SendMessage message = new SendMessage().setChatId(chatId).setText(answer);
 					try {
 						execute(message);
@@ -117,8 +117,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void processStart(Update update, long chatId, String messageText) {
-		String answer = "Hi, xHumanicus! I can’t do much just yet, but soon I will gain new skills. In order to register on our forum you need to enter a valid email address. To do so, please click /share_email_address (this will be used in case you wanted to reset the password)..\n"
-				+ "By clicking on it you agree with our Terms and Conditions http://webapp.xhumanity.org/privacy/forum_t_c.html\n\n"
+		String answer = "Hi, xHumanicus! I can’t do much just yet, but soon I will gain new skills. In order to register on our forum you need to enter a valid email address. To do so, please click /share_email_address (this will be used in case you wanted to reset the password).\n"
+				+ "By clicking on it you agree with our <a href='http://webapp.xhumanity.org/privacy/forum_t_c.html'>Terms and Conditions</a>\n\n"
 				+ "/share_email_address";
 		SendMessage message = new SendMessage().setChatId(chatId).setText(answer).setParseMode(ParseMode.HTML);
 		try {
@@ -140,9 +140,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 				telegramUser.setForumUserId(user.getUserId());
 				telegramUserRepository.save(telegramUser);
 				answer += " Username: " + telegramUser.getForumUsername() + ", Pass: " + password + "\n"
-						+ "To log in please go to https://forum.xhumanity.org/register/login\n\n"
-						+ "Now you can send us links to your promotional videos. Just post the link here and we'll do the rest for you...\n\n"
-						+ "For a better experience within our comunity /share_phone_number with us";
+						+ "To log in please go to <a href='https://forum.xhumanity.org/register/login'>Login</a>\n\n"
+						+ "You can share your YouTube link on this chat directly and we'll do the rest for you...\n\n"
+						+ "For a better experience within our comunity /share_phone_number with us. This is optional.";
 			} catch (IntegrationException e) {
 				answer = e.getMessage();
 			} catch (Exception e) {
@@ -153,7 +153,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			answer = "You first need to send us a valid email address (this will be used in case you want to reset your password).\n" +
 					"Please enter your email address.";
 		}
-		SendMessage msg = new SendMessage().setChatId(chatId).setText(answer);
+		SendMessage msg = new SendMessage().setChatId(chatId).setText(answer).setParseMode(ParseMode.HTML);
 		try {
 			execute(msg);
 			logReceivedMessage(update.getMessage().getChat(), messageText, answer);
@@ -195,7 +195,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void displayShareNumberOption(Update update, long chatId, String messageText) {
-		String answer = "To share your phone number please click on the button bellow.";
+		String answer = "To share your phone number please click on the button bellow (optional)";
 		SendMessage message = new SendMessage().setChatId(chatId).setText(answer);
 		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 		List<KeyboardRow> keyboard = new ArrayList<>();
@@ -247,15 +247,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	private void processYoutubeLink(Update update, TelegramUser telegramUser, long chatId, String videoUrl) {
-		final StringBuffer answer = new StringBuffer(
-				"Your clip has been taken into account. You can visit our forum to check its status:");
+		final StringBuffer answer = new StringBuffer();
 		if (telegramUser.getForumUserId() == null) {
 			String command = "/share_email_address";
 			if (Utils.isEmailValid(telegramUser.getForumEmail())) {
 				command = "/forum_sign_up";
 			}
-			Utils.replace(answer,
-					"Sorry, we cannot take your link into account. You first need to create an account on our forum " + command);
+			answer.append("Sorry, we cannot post this for you yet. You first need to create an account on our forum " + command);
 		} else {
 			String videoId = YoutubeUtils.getVideoIdFromYoutubeUrl(videoUrl);
 			logger.info("videoId = " + videoId);
@@ -268,7 +266,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 			try {
 				String postLink = videoRegistrationService.register(telegramUser, videoUrl, forumApiKey);
-				answer.append(" ").append(postLink);
+				answer.append("Your clip has been taken into account. You can visit our <a href='" + postLink + "'>forum</a> to check its status.");
 				logger.info(postLink);
 			} catch (Exception e) {
 				logger.error(e);
@@ -276,7 +274,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 		}
 		try {
-			SendMessage message = new SendMessage().setChatId(chatId).setText(answer.toString());
+			SendMessage message = new SendMessage().setChatId(chatId).setText(answer.toString()).setParseMode(ParseMode.HTML);
 			execute(message);
 		} catch (TelegramApiException e) {
 			logger.error(e);
