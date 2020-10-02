@@ -47,13 +47,13 @@ public class FacebookService {
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
 
-	public void createFacebookAccessToken(String code, String username) throws URISyntaxException, IOException {
+	public void createFacebookAccessToken(String code) throws URISyntaxException, IOException {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code,
 				"https://webapp.xhumanity.org:8443/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername("xH00001");
 		telegramUser.ifPresent(u -> {
 			u.setFbAccessToken(accessToken);
 			telegramUserRepository.save(u);
