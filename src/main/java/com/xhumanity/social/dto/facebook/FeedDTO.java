@@ -9,5 +9,6 @@ import lombok.Data;
 public class FeedDTO {
 	private String firstName;
 	private String lastName;
+	private Integer userId;
 	private List<PostDTO> posts = new ArrayList<>();
 }

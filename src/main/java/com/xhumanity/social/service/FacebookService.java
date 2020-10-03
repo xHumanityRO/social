@@ -139,6 +139,7 @@ public class FacebookService {
 					FacebookUtils.USER_FIELD_LAST_NAME);
 			feed.setFirstName(userProfile.getFirstName());
 			feed.setLastName(userProfile.getLastName());
+			feed.setUserId(forumUserId);
 			PagedList<Post> userFeed = facebook.feedOperations().getFeed();
 			userFeed.forEach(p -> {
 				PostDTO post = new PostDTO();
@@ -152,7 +153,7 @@ public class FacebookService {
 		return feed;
 	}
 
-	public CampaignVideoDTO registerPost(Model model, Integer forumUserId, String videoUrl) {
+	public CampaignVideoDTO registerPost(Integer forumUserId, String videoUrl) {
 		CampaignVideoDTO campaignVideoDTO = CampaignVideoDTO.builder().build();
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		if (telegramUser.isPresent() && videoUrl != null && !"".equals(videoUrl)) {

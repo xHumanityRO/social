@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CampaignVideoDTO {
+	private Integer userId;
 	private String videoUrl;
 	@JsonIgnore
 	private String postUrl;
