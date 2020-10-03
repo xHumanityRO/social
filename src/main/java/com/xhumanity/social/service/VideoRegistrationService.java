@@ -32,7 +32,7 @@ public class VideoRegistrationService {
 				.postUrl(postLink)
 				.build());
 		
-		return CampaignVideoDTO.builder().postUrl(postLink).videoUrl(videoUrl).build();
+		return CampaignVideoDTO.builder().postUrl(postLink).videoUrl(videoUrl).userId(user.getForumUserId()).build();
 	}
 
 	private String createPost(TelegramUser user, String url, String forumApiKey) {
