@@ -26,9 +26,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.api.services.youtube.model.VideoListResponse;
+import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.dto.forum.UserDTO;
 import com.xhumanity.social.exception.IntegrationException;
+import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.service.VideoRegistrationService;
@@ -265,9 +267,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 
 			try {
-				String postLink = videoRegistrationService.register(telegramUser, videoUrl, forumApiKey);
-				answer.append("Your clip has been taken into account. You can visit our <a href='" + postLink + "'>forum</a> to check its status.");
-				logger.info(postLink);
+				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
+				String postUrl = campaignVideoDTO.getPostUrl();
+				answer.append("Your clip has been taken into account. You can visit our <a href='" + postUrl + "'>forum</a> to check its status.");
+				logger.info(postUrl);
 			} catch (Exception e) {
 				logger.error(e);
 				Utils.replace(answer, "Error occurred while processing your link");

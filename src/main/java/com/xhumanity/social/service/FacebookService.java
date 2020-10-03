@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.Page;
 import org.springframework.social.facebook.api.PagedList;
@@ -18,15 +21,20 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.facebook.FeedDTO;
 import com.xhumanity.social.dto.facebook.PostDTO;
+import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.utils.FacebookUtils;
 
 @Service
 public class FacebookService {
+	private static final Logger logger = LogManager.getLogger(FacebookService.class);
 
 	@Value("${spring.social.facebook.appId}")
 	private String facebookAppId;
@@ -34,12 +42,28 @@ public class FacebookService {
 	private String facebookSecret;
 	@Value("${my.chatId}")
 	private Long myChatId;
-
+	@Value("${forum.api.key}")
+	private String forumApiKey;
+	
 	@Autowired
 	private TelegramUserRepository telegramUserRepository;
+	@Autowired
+	private VideoRegistrationService videoRegistrationService;
 
 	private String accessToken;
 
+	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Exception occured while processing...")
+	@ExceptionHandler
+	void onInternalError(final InternalError ex) {
+		
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Some parameters are invalid")
+	@ExceptionHandler
+	void onIllegalArgumentException(final IllegalArgumentException ex) {
+		
+	}
+	
 	public String createFacebookAuthorizationURL() {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
@@ -126,5 +150,22 @@ public class FacebookService {
 			model.addAttribute("userFeed", userFeed);
 		});
 		return feed;
+	}
+
+	public CampaignVideoDTO registerPost(Model model, Integer forumUserId, String videoUrl) {
+		CampaignVideoDTO campaignVideoDTO = CampaignVideoDTO.builder().build();
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
+		if (telegramUser.isPresent() && videoUrl != null && !"".equals(videoUrl)) {
+			try {
+				campaignVideoDTO = videoRegistrationService.register(telegramUser.get(), videoUrl, forumApiKey, CampaignVideo.SOURCE_FACEBOOK);
+			} catch (Exception e) {
+				logger.error(e);
+				throw new InternalError();
+			}
+		} else {
+			throw new IllegalArgumentException();
+		}
+		
+		return campaignVideoDTO;
 	}
 }

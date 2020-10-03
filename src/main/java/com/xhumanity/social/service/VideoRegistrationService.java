@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.forum.PostDTO;
 import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
@@ -21,17 +22,17 @@ public class VideoRegistrationService {
 	@Autowired
 	private CampaignVideoRepository campaignVideoRepository;
 	
-	public String register(TelegramUser user, String url, String forumApiKey) throws Exception {
-		String postLink = createPost(user, url, forumApiKey);
+	public CampaignVideoDTO register(TelegramUser user, String videoUrl, String forumApiKey, String source) throws Exception {
+		String postLink = createPost(user, videoUrl, forumApiKey);
 		campaignVideoRepository.save(CampaignVideo.builder()
 				.campaignId(WELCOME_XHUMANITY_CAMPAIGN_ID)
-				.source(CampaignVideo.SOURCE_YOUTUBE)
+				.source(source)
 				.userId(user.getId())
-				.link(url)
+				.link(videoUrl)
 				.postUrl(postLink)
 				.build());
 		
-		return postLink;
+		return CampaignVideoDTO.builder().postUrl(postLink).build();
 	}
 
 	private String createPost(TelegramUser user, String url, String forumApiKey) {
