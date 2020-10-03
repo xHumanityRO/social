@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.facebook.FeedDTO;
-import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.service.FacebookService;
 
 @Controller
@@ -32,7 +31,7 @@ public class FBOperationsController {
 		return facebookService.getFeed(model, forumUserId);
     }
 
-	@PostMapping("/feed")
+	@PostMapping(path = "/feed", consumes = "application/json", produces = "application/json")
     public @ResponseBody CampaignVideoDTO feed(@RequestBody CampaignVideoDTO video) {
 		return facebookService.registerPost(video.getUserId(), video.getPostUrl());
     }
