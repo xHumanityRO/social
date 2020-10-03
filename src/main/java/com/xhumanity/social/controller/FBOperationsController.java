@@ -1,5 +1,7 @@
 package com.xhumanity.social.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ import com.xhumanity.social.service.FacebookService;
 @Controller
 @RequestMapping("/")
 public class FBOperationsController {
+	private static final Logger logger = LogManager.getLogger(FBOperationsController.class);
 
 	@Autowired
 	FacebookService facebookService;
@@ -33,6 +36,7 @@ public class FBOperationsController {
 
 	@PostMapping(path = "/feed", consumes = "application/json", produces = "application/json")
     public @ResponseBody CampaignVideoDTO feed(@RequestBody CampaignVideoDTO video) {
+		logger.info(video);
 		return facebookService.registerPost(video.getUserId(), video.getPostUrl());
     }
 }
