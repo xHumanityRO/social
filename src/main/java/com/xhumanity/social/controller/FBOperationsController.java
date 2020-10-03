@@ -18,12 +18,12 @@ public class FBOperationsController {
 	@Autowired
 	FacebookService facebookService;
 
-	@GetMapping("/posts/{username}")
+	@GetMapping("/posts/{forumUserId}")
     public String posts(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
 		return facebookService.getPosts(model, forumUserId);
     }
 	
-	@GetMapping("/feed/{username}")
+	@GetMapping("/feed/{forumUserId}")
     public @ResponseBody FeedDTO feed(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
 		return facebookService.getFeed(model, forumUserId);
     }
