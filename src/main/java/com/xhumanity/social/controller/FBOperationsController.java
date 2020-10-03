@@ -19,12 +19,12 @@ public class FBOperationsController {
 	FacebookService facebookService;
 
 	@GetMapping("/posts/{username}")
-    public String posts(Model model, @PathVariable(value = "username") String username) {
-		return facebookService.getPosts(model, username);
+    public String posts(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
+		return facebookService.getPosts(model, forumUserId);
     }
 	
 	@GetMapping("/feed/{username}")
-    public @ResponseBody FeedDTO feed(Model model, @PathVariable(value = "username") String username) {
-		return facebookService.getFeed(model, username);
+    public @ResponseBody FeedDTO feed(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
+		return facebookService.getFeed(model, forumUserId);
     }
 }

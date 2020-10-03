@@ -31,7 +31,7 @@ public class TelegramUser {
 	private Long chatId;
 	
 	@Column(name = "user_id")
-	private long userId;
+	private Long userId;
 	
 	@Column(name = "username")
 	private String username;

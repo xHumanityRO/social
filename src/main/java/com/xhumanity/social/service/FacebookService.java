@@ -89,7 +89,7 @@ public class FacebookService {
 		return pageInfo;
 	}
 
-	public String getPosts(Model model, String forumUserId) {
+	public String getPosts(Model model, Integer forumUserId) {
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		telegramUser.ifPresent(u -> {
 			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
@@ -104,7 +104,7 @@ public class FacebookService {
 		return "feed";
 	}
 
-	public FeedDTO getFeed(Model model, String forumUserId) {
+	public FeedDTO getFeed(Model model, Integer forumUserId) {
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		FeedDTO feed = new FeedDTO();
 		telegramUser.ifPresent(u -> {

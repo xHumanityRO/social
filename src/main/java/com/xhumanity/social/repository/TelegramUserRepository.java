@@ -21,6 +21,6 @@ public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long
 	
 	Optional<TelegramUser> findByForumEmail(@Param("forumEmail") String forumEmail);
 
-	Optional<TelegramUser> findByForumUserId(@Param("forumUserId") String forumUserId);
+	Optional<TelegramUser> findByForumUserId(@Param("forumUserId") Integer forumUserId);
 }
 
