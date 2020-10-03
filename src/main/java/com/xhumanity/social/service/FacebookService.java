@@ -29,9 +29,11 @@ import com.xhumanity.social.utils.FacebookUtils;
 public class FacebookService {
 
 	@Value("${spring.social.facebook.appId}")
-	String facebookAppId;
+	private String facebookAppId;
 	@Value("${spring.social.facebook.appSecret}")
-	String facebookSecret;
+	private String facebookSecret;
+	@Value("${my.chatId}")
+	private Long myChatId;
 
 	@Autowired
 	private TelegramUserRepository telegramUserRepository;
@@ -53,7 +55,7 @@ public class FacebookService {
 				"https://webapp.xhumanity.org:8443/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername("xH00001");
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByChatId(myChatId);
 		telegramUser.ifPresent(u -> {
 			u.setFbAccessToken(accessToken);
 			telegramUserRepository.save(u);
@@ -87,8 +89,8 @@ public class FacebookService {
 		return pageInfo;
 	}
 
-	public String getPosts(Model model, String username) {
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
+	public String getPosts(Model model, String forumUserId) {
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		telegramUser.ifPresent(u -> {
 			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
 
@@ -102,8 +104,8 @@ public class FacebookService {
 		return "feed";
 	}
 
-	public FeedDTO getFeed(Model model, String username) {
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByUsername(username);
+	public FeedDTO getFeed(Model model, String forumUserId) {
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		FeedDTO feed = new FeedDTO();
 		telegramUser.ifPresent(u -> {
 			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
