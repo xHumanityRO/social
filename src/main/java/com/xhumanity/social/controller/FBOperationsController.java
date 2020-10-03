@@ -37,6 +37,6 @@ public class FBOperationsController {
 	@PostMapping(path = "/feed", consumes = "application/json", produces = "application/json")
     public @ResponseBody CampaignVideoDTO feed(@RequestBody CampaignVideoDTO video) {
 		logger.info(video);
-		return facebookService.registerPost(video.getUserId(), video.getPostUrl());
+		return facebookService.registerPost(video.getUserId(), video.getVideoUrl());
     }
 }
