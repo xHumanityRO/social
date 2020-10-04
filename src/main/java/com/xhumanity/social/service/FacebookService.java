@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.social.facebook.api.Comment;
 
 import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.facebook.FeedDTO;
@@ -69,7 +70,7 @@ public class FacebookService {
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 		OAuth2Parameters params = new OAuth2Parameters();
 		params.setRedirectUri("https://webapp.xhumanity.org:8443/social/facebook");
-		params.setScope("public_profile,email,user_birthday,user_posts");
+		params.setScope("public_profile,email,user_birthday,user_posts,read_insights");
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
 
@@ -146,9 +147,17 @@ public class FacebookService {
 				post.setId(p.getId());
 				post.setMessage(p.getMessage());
 				post.setPicture(p.getPicture());
-				post.setMessage(p.getLink());
+				post.setLink(p.getLink());
 				feed.getPosts().add(post);
 			});
+//			PagedList usersLikeThisPost = facebook.likeOperations().getLikes("3418160981537358_2389353731084760");
+//			Integer likes = usersLikeThisPost.size();
+//			logger.info("likes count: " + likes);
+//			PagedList<Comment> comments = facebook.commentOperations().getComments("3418160981537358_2389353731084760");
+//			for (Comment comment : comments) {
+//				logger.info("comment: " + comment.getMessage());
+//			}
+			//3418160981537358_3510908308929291?fields=shares,reactions,comments.summary(true)
 			model.addAttribute("userFeed", userFeed);
 		});
 		return feed;
