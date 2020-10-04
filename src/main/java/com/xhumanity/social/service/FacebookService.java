@@ -146,6 +146,7 @@ public class FacebookService {
 				post.setId(p.getId());
 				post.setMessage(p.getMessage());
 				post.setPicture(p.getPicture());
+				post.setMessage(p.getLink());
 				feed.getPosts().add(post);
 			});
 			model.addAttribute("userFeed", userFeed);
