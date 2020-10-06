@@ -22,6 +22,7 @@ public class CampaignVideo {
 
 	public static final String SOURCE_YOUTUBE = "youtube";
 	public static final String SOURCE_FACEBOOK = "facebook";
+	public static final String SOURCE_INSTAGRAM = "instagram";
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

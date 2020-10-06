@@ -47,6 +47,9 @@ public class TelegramUser {
 	
 	@Column(name = "fb_access_token")
 	private String fbAccessToken;
+	
+	@Column(name = "insta_access_token")
+	private String instaAccessToken;
 
 	@Column(name = "user_lastvisit")
 	private Date lastVisit;

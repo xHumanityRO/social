@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.Page;
 import org.springframework.social.facebook.api.PagedList;
@@ -21,9 +20,6 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.social.facebook.api.Comment;
 
 import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.facebook.FeedDTO;
@@ -53,23 +49,11 @@ public class FacebookService {
 
 	private String accessToken;
 
-	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Exception occured while processing...")
-	@ExceptionHandler
-	void onInternalError(final InternalError ex) {
-		
-	}
-	
-	@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Some parameters are invalid")
-	@ExceptionHandler
-	void onIllegalArgumentException(final IllegalArgumentException ex) {
-		
-	}
-	
 	public String createFacebookAuthorizationURL() {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 		OAuth2Parameters params = new OAuth2Parameters();
-		params.setRedirectUri("https://webapp.xhumanity.org:8443/social/facebook");
+		params.setRedirectUri("https://webapp.xhumanity.org/social/facebook");
 		params.setScope("public_profile,email,user_birthday,user_posts,read_insights");
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
@@ -77,7 +61,7 @@ public class FacebookService {
 	public void createFacebookAccessToken(String code) throws URISyntaxException, IOException {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code,
-				"https://webapp.xhumanity.org:8443/social/facebook", null);
+				"https://webapp.xhumanity.org/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByChatId(myChatId);
@@ -168,7 +152,7 @@ public class FacebookService {
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		if (telegramUser.isPresent() && videoUrl != null && !"".equals(videoUrl)) {
 			try {
-				campaignVideoDTO = videoRegistrationService.register(telegramUser.get(), videoUrl, forumApiKey, CampaignVideo.SOURCE_FACEBOOK);
+				campaignVideoDTO = videoRegistrationService.register(telegramUser.get(), videoUrl, "", forumApiKey, CampaignVideo.SOURCE_FACEBOOK);
 			} catch (Exception e) {
 				logger.error(e);
 				throw new InternalError();

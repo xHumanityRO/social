@@ -22,13 +22,14 @@ public class VideoRegistrationService {
 	@Autowired
 	private CampaignVideoRepository campaignVideoRepository;
 	
-	public CampaignVideoDTO register(TelegramUser user, String videoUrl, String forumApiKey, String source) throws Exception {
+	public CampaignVideoDTO register(TelegramUser user, String videoUrl, String mediaId, String forumApiKey, String source) throws Exception {
 		String postLink = createPost(user, videoUrl, forumApiKey);
 		campaignVideoRepository.save(CampaignVideo.builder()
 				.campaignId(WELCOME_XHUMANITY_CAMPAIGN_ID)
 				.source(source)
 				.userId(user.getId())
 				.link(videoUrl)
+				.entityId(mediaId)
 				.postUrl(postLink)
 				.build());
 		

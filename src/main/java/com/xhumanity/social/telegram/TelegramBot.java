@@ -267,7 +267,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 
 			try {
-				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
+				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, videoId, forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
 				String postUrl = campaignVideoDTO.getPostUrl();
 				answer.append("Your clip has been taken into account. You can visit our <a href='" + postUrl + "'>forum</a> to check its status.");
 				logger.info(postUrl);

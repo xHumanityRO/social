@@ -14,6 +14,7 @@ CREATE TABLE telegram_users (
   user_lastvisit DATETIME DEFAULT NULL,
   user_regdate DATETIME DEFAULT NULL,
   fb_access_token VARCHAR(255) DEFAULT NULL,
+  insta_access_token VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
@@ -26,5 +27,23 @@ CREATE TABLE campaign_video (
   link VARCHAR(500) DEFAULT '',
   entity_id VARCHAR(50) DEFAULT '',
   post_url VARCHAR(500) DEFAULT '',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS instagram_insight;
+CREATE TABLE instagram_insight (
+  id INT NOT NULL AUTO_INCREMENT,
+  media_url VARCHAR(500) DEFAULT '',
+  likes INT DEFAULT 0,
+  dislikes INT DEFAULT 0,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS instagram_insight_comment;
+CREATE TABLE instagram_insight_comment (
+  id INT NOT NULL AUTO_INCREMENT,
+  insight_id INT NOT NULL DEFAULT 0,
+  comment_id INT DEFAULT 0,
+  message VARCHAR(5000) DEFAULT '',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
