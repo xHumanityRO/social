@@ -76,9 +76,10 @@ public class InstagramController {
 		if (auth == null || auth.getUserId() == null || auth.getToken() == null || "".equals(auth.getToken())) {
 			throw new InternalError();
 		}
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(auth.getUserId());
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(auth.getForumUserId());
 		if (telegramUser.isPresent()) {
 			TelegramUser user = telegramUser.get();
+			user.setInstaUserId(auth.getUserId());
 			user.setInstaAccessToken(auth.getToken());
 			telegramUserRepository.save(user);
 		} else {
@@ -98,7 +99,7 @@ public class InstagramController {
 		if (campaignVideoRepository.findByLink(media.getMediaUrl()).isPresent()) {
 			throw new InternalError();
 		}
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(media.getUserId());
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(media.getForumUserId());
 		String mediaUrl = media.getMediaUrl();
 		if (telegramUser.isPresent() && mediaUrl != null && !"".equals(mediaUrl)) {
 			try {
@@ -147,7 +148,12 @@ public class InstagramController {
 		List<InstagramMediaDTO> media = new ArrayList<>();
 		List<CampaignVideo> mediaList = campaignVideoRepository.findAllBySource(CampaignVideo.SOURCE_INSTAGRAM);
 		for (CampaignVideo campaignVideo : mediaList) {
-			media.add(InstagramMediaDTO.builder().userId(campaignVideo.getUserId()).mediaUrl(campaignVideo.getLink())
+			Optional<TelegramUser> telegramUser = telegramUserRepository.findById(campaignVideo.getUserId());
+			String forumUserId = null;
+			if (telegramUser.isPresent()) {
+				forumUserId = telegramUser.get().getInstaUserId();
+			}
+			media.add(InstagramMediaDTO.builder().userId(forumUserId).mediaUrl(campaignVideo.getLink())
 					.mediaId(campaignVideo.getEntityId()).build());
 		}
 		return media;

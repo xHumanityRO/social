@@ -1,6 +1,7 @@
 package com.xhumanity.social.config;
 
 import static springfox.documentation.builders.PathSelectors.regex;
+import static com.google.common.base.Predicates.or;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ public class SwaggerConfig {
 	}
 
 	private Predicate<String> postPaths() {
-		return regex("/instagram.*");
+		return or(regex("/instagram.*"), regex("/instagram/.*"));
 	}
 
 	private ApiInfo apiInfo() {

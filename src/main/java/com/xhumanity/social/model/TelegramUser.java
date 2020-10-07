@@ -48,6 +48,9 @@ public class TelegramUser {
 	@Column(name = "fb_access_token")
 	private String fbAccessToken;
 	
+	@Column(name = "insta_user_id")
+	private String instaUserId;
+	
 	@Column(name = "insta_access_token")
 	private String instaAccessToken;
 

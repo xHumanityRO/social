@@ -10,7 +10,8 @@ import lombok.ToString;
 @Builder
 @ToString
 public class InstagramMediaDTO {
-	private Integer userId;
+	private Integer forumUserId;
+	private String userId;
 	private String mediaId;
 	private String mediaUrl;
 	@JsonIgnore

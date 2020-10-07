@@ -14,6 +14,7 @@ CREATE TABLE telegram_users (
   user_lastvisit DATETIME DEFAULT NULL,
   user_regdate DATETIME DEFAULT NULL,
   fb_access_token VARCHAR(255) DEFAULT NULL,
+  insta_user_id VARCHAR(50) DEFAULT NULL,
   insta_access_token VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;

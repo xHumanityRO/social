@@ -8,7 +8,8 @@ import lombok.ToString;
 @Builder
 @ToString
 public class AuthenticationDTO {
-	private Integer userId;
+	private Integer forumUserId;
+	private String userId;
 	private String token;
 	private Long validity;
 }

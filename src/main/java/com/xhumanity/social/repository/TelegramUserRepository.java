@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.xhumanity.social.model.TelegramUser;
 
-public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long> {
+public interface TelegramUserRepository extends JpaRepository<TelegramUser, Integer> {
 	
 	Optional<TelegramUser> findByUsername(@Param("username") final String username);
 	
