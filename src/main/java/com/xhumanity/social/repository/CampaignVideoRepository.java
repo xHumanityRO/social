@@ -16,4 +16,6 @@ public interface CampaignVideoRepository extends JpaRepository<CampaignVideo, In
 
 	List<CampaignVideo> findAllBySource(@Param("source") String source);
 
+	List<CampaignVideo> findAllBySourceAndUserId(String source, Integer userId);
+
 }

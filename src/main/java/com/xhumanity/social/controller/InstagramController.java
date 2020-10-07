@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -149,13 +150,44 @@ public class InstagramController {
 		List<CampaignVideo> mediaList = campaignVideoRepository.findAllBySource(CampaignVideo.SOURCE_INSTAGRAM);
 		for (CampaignVideo campaignVideo : mediaList) {
 			Optional<TelegramUser> telegramUser = telegramUserRepository.findById(campaignVideo.getUserId());
-			String forumUserId = null;
+			Integer forumUserId = null;
+			String instaUserId = null;
 			if (telegramUser.isPresent()) {
-				forumUserId = telegramUser.get().getInstaUserId();
+				instaUserId = telegramUser.get().getInstaUserId();
+				forumUserId = telegramUser.get().getForumUserId();
 			}
-			media.add(InstagramMediaDTO.builder().userId(forumUserId).mediaUrl(campaignVideo.getLink())
-					.mediaId(campaignVideo.getEntityId()).build());
+			media.add(InstagramMediaDTO.builder().userId(instaUserId).forumUserId(forumUserId)
+					.mediaUrl(campaignVideo.getLink()).mediaId(campaignVideo.getEntityId()).build());
 		}
+		return media;
+	}
+
+	@GetMapping("/instagram/media/{forumUserId}")
+	public @ResponseBody List<InstagramMediaDTO> userMedia(@RequestHeader("xhs-apikey") final String apiKey,
+			@PathVariable("forumUserId") final Integer forumUserId) throws IllegalAccessException {
+		if (!xhumanityApiKey.equals(apiKey)) {
+			throw new IllegalAccessException();
+		}
+		if (forumUserId == null) {
+			logger.info("forum user ID not specified");
+			throw new IllegalArgumentException();
+		}
+
+		List<InstagramMediaDTO> media = new ArrayList<>();
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
+		if (telegramUser.isPresent()) {
+			List<CampaignVideo> mediaList = campaignVideoRepository
+					.findAllBySourceAndUserId(CampaignVideo.SOURCE_INSTAGRAM, telegramUser.get().getId());
+			for (CampaignVideo campaignVideo : mediaList) {
+				String instaUserId = telegramUser.get().getInstaUserId();
+				media.add(InstagramMediaDTO.builder().userId(instaUserId).forumUserId(forumUserId)
+						.mediaUrl(campaignVideo.getLink()).mediaId(campaignVideo.getEntityId()).build());
+			}
+		} else {
+			logger.info("user not found: " + forumUserId);
+			throw new IllegalArgumentException();
+		}
+
 		return media;
 	}
 }
