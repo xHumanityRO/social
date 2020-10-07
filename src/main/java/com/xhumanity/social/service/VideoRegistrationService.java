@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.xhumanity.social.dto.CampaignVideoDTO;
-import com.xhumanity.social.dto.forum.PostDTO;
+import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.CampaignVideoRepository;
@@ -17,7 +17,7 @@ public class VideoRegistrationService {
 	private static final Logger logger = LogManager.getLogger(VideoRegistrationService.class);
 
 	private static final int PROMO_TOPIC_ID = 11100297;
-	private static final int WELCOME_XHUMANITY_CAMPAIGN_ID = 1;
+	private static final int WELCOME_XHUMANITY_CAMPAIGN_ID = 827617;
 
 	@Autowired
 	private CampaignVideoRepository campaignVideoRepository;
@@ -37,14 +37,13 @@ public class VideoRegistrationService {
 	}
 
 	private String createPost(TelegramUser user, String url, String forumApiKey) {
-		int topicId = PROMO_TOPIC_ID;
 		final String subject = user.getFirstName() + "'s promotional video";
 		final String message = "This is my video. Waiting for your reaction...\\n" + url;
 
 		String postLink = "Error creating automated post";
 		try {
-			PostDTO post = ForumUtils.createPost(user.getForumUsername(), topicId, subject, message, forumApiKey);
-			postLink = post.getURL();
+			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(), WELCOME_XHUMANITY_CAMPAIGN_ID, subject, message, forumApiKey);
+			postLink = topic.getURL();
 		} catch (Exception e) {
 			logger.error(e);
 		}
