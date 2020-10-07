@@ -20,16 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.xhumanity.social.dto.instagram.AuthenticationDTO;
-import com.xhumanity.social.dto.instagram.CommentDTO;
 import com.xhumanity.social.dto.instagram.InsightDTO;
 import com.xhumanity.social.dto.instagram.InstagramMediaDTO;
 import com.xhumanity.social.model.CampaignVideo;
-import com.xhumanity.social.model.InstagramInsight;
-import com.xhumanity.social.model.InstagramInsightComment;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.CampaignVideoRepository;
-import com.xhumanity.social.repository.InstagramInsightCommentRepository;
-import com.xhumanity.social.repository.InstagramInsightRepository;
 import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.service.InstagramService;
 import com.xhumanity.social.service.VideoRegistrationService;
@@ -94,7 +89,7 @@ public class InstagramController {
 	}
 
 	@PostMapping(path = "/instagram/media", consumes = "application/json", produces = "application/json")
-	public @ResponseBody InstagramMediaDTO posts(@RequestHeader("xhs-apikey") String apiKey,
+	public @ResponseBody InstagramMediaDTO registration(@RequestHeader("xhs-apikey") String apiKey,
 			@RequestBody InstagramMediaDTO media) throws IllegalAccessException {
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
