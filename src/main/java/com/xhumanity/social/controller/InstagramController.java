@@ -93,16 +93,22 @@ public class InstagramController {
 	@PostMapping(path = "/instagram/media", consumes = "application/json", produces = "application/json")
 	public @ResponseBody InstagramMediaDTO registration(@RequestHeader("xhs-apikey") String apiKey,
 			@RequestBody InstagramMediaDTO media) throws IllegalAccessException {
+
+		String mediaUrl = media.getMediaUrl();
+
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
 		}
-
+		if (mediaUrl == null || "".equals(mediaUrl)) {
+			logger.info("mediaUrl is empty");
+			throw new IllegalArgumentException();
+		}
 		if (campaignVideoRepository.findByLink(media.getMediaUrl()).isPresent()) {
 			throw new InternalError();
 		}
+		
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(media.getForumUserId());
-		String mediaUrl = media.getMediaUrl();
-		if (telegramUser.isPresent() && mediaUrl != null && !"".equals(mediaUrl)) {
+		if (telegramUser.isPresent()) {
 			try {
 				videoRegistrationService.register(telegramUser.get(), mediaUrl, media.getMediaId(), forumApiKey,
 						CampaignVideo.SOURCE_INSTAGRAM);
