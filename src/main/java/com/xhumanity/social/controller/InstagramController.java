@@ -84,7 +84,7 @@ public class InstagramController {
 			user.setInstaAccessToken(auth.getToken());
 			telegramUserRepository.save(user);
 		} else {
-			logger.info("user not found: " + auth.getUserId());
+			logger.info("user not found: " + auth.getForumUserId());
 			throw new IllegalArgumentException();
 		}
 		return auth;
@@ -111,7 +111,7 @@ public class InstagramController {
 				throw new InternalError();
 			}
 		} else {
-			logger.info("user not found: " + media.getUserId());
+			logger.info("user not found: " + media.getForumUserId());
 			throw new IllegalArgumentException();
 		}
 		return media;
