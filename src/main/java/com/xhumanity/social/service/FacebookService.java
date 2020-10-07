@@ -49,22 +49,24 @@ public class FacebookService {
 
 	private String accessToken;
 
-	public String createFacebookAuthorizationURL() {
+	public String createFacebookAuthorizationURL(Integer forumUserId) {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 		OAuth2Parameters params = new OAuth2Parameters();
 		params.setRedirectUri("https://webapp.xhumanity.org/social/facebook");
 		params.setScope("public_profile,email,user_birthday,user_posts,read_insights");
+		params.setState(String.valueOf(forumUserId));
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
 
-	public void createFacebookAccessToken(String code) throws URISyntaxException, IOException {
+	public void createFacebookAccessToken(Integer forumUserId, String code) throws URISyntaxException, IOException {
 		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 		AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code,
 				"https://webapp.xhumanity.org/social/facebook", null);
 		accessToken = accessGrant.getAccessToken();
 
-		Optional<TelegramUser> telegramUser = telegramUserRepository.findByChatId(myChatId);
+		//Optional<TelegramUser> telegramUser = telegramUserRepository.findByChatId(myChatId);
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
 		telegramUser.ifPresent(u -> {
 			u.setFbAccessToken(accessToken);
 			telegramUserRepository.save(u);
