@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +34,12 @@ public class FBAuthController {
 	}
 
 	@GetMapping("/facebook")
-	public void createFacebookAccessToken(@RequestParam("state") Integer forumUserId,
+	public RedirectView createFacebookAccessToken(Model model, @RequestParam("state") Integer forumUserId,
 			@RequestParam("code") String code) throws URISyntaxException, IOException {
 		facebookService.createFacebookAccessToken(forumUserId, code);
+		RedirectView redirectView = new RedirectView();
+		redirectView.setUrl("https://webapp.xhumanity.org/social/posts/" + forumUserId);
+		return redirectView;
 	}
 
 	@GetMapping("/getName")
