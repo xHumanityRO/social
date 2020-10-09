@@ -29,7 +29,7 @@ public class InstagramInsightComment {
 	private Integer insightId;
 	
 	@Column(name = "comment_id")
-	private Integer commentId;
+	private Long commentId;
 	
 	@Column(name = "message")
 	private String message;

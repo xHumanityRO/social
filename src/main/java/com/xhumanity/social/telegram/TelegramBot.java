@@ -42,12 +42,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 	private static final Logger logger = LogManager.getLogger(TelegramBot.class);
 
 	private static final String BOT_NAME = "xHumanityBotTest";
-	private static final int YOUTUBE_CAMPAIGN_ID = 827617;
 	private static final String USERNAME_PREFIX = "H";
 
 	private VideoRegistrationService videoRegistrationService;
 	private TelegramUserRepository telegramUserRepository;
-	
 
 	private String telegramToken;
 
@@ -55,7 +53,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private String youtubeApiKey;
 
-	public TelegramBot(VideoRegistrationService videoRegistrationService, TelegramUserRepository telegramUserRepository, String telegramToken, String forumApiKey, String youtubeApiKey) {
+	public TelegramBot(VideoRegistrationService videoRegistrationService, TelegramUserRepository telegramUserRepository,
+			String telegramToken, String forumApiKey, String youtubeApiKey) {
 		this.videoRegistrationService = videoRegistrationService;
 		this.telegramUserRepository = telegramUserRepository;
 		this.telegramToken = telegramToken;
@@ -88,12 +87,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 					processEmailAddress(update, telegramUser, chatId, messageText);
 				} else {
 					// Unknown command
-					String answer = "I can only respond to the following commands:\n" +
-							"/start\n" +
-							"/share_email_address\n" +
-							"/forum_sign_up\n" +
-							"/share_phone_number (optional)\n\n" +
-							"And if you copy here a valid YouTube link, I will post it on your behalf on the forum. Don’t post the link directly on the forum, let me do the work for you.";
+					String answer = "I can only respond to the following commands:\n" + "/start\n"
+							+ "/share_email_address\n" + "/forum_sign_up\n" + "/share_phone_number (optional)\n\n"
+							+ "And if you copy here a valid YouTube link, I will post it on your behalf on the forum. Don’t post the link directly on the forum, let me do the work for you.";
 					SendMessage message = new SendMessage().setChatId(chatId).setText(answer);
 					try {
 						execute(message);
@@ -133,10 +129,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	private void createForumAccount(Update update, TelegramUser telegramUser, long chatId, String messageText) {
 		String answer = "Account created.";
-		
+
 		if (Utils.isEmailValid(telegramUser.getForumEmail())) {
 			String password = generatePassword();
-	
+
 			try {
 				UserDTO user = createForumUser(telegramUser, password, chatId);
 				telegramUser.setForumUserId(user.getUserId());
@@ -152,8 +148,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 				answer = "Error occurred while creating your forum account. Please try again later.";
 			}
 		} else {
-			answer = "You first need to send us a valid email address (this will be used in case you want to reset your password).\n" +
-					"Please enter your email address.";
+			answer = "You first need to send us a valid email address (this will be used in case you want to reset your password).\n"
+					+ "Please enter your email address.";
 		}
 		SendMessage msg = new SendMessage().setChatId(chatId).setText(answer).setParseMode(ParseMode.HTML);
 		try {
@@ -255,7 +251,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 			if (Utils.isEmailValid(telegramUser.getForumEmail())) {
 				command = "/forum_sign_up";
 			}
-			answer.append("Sorry, we cannot post this for you yet. You first need to create an account on our forum " + command);
+			answer.append("Sorry, we cannot post this for you yet. You first need to create an account on our forum "
+					+ command);
 		} else {
 			String videoId = YoutubeUtils.getVideoIdFromYoutubeUrl(videoUrl);
 			logger.info("videoId = " + videoId);
@@ -267,9 +264,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 
 			try {
-				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, videoId, forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
+				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, videoId,
+						forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
 				String postUrl = campaignVideoDTO.getPostUrl();
-				answer.append("Your clip has been taken into account. You can visit our <a href='" + postUrl + "'>forum</a> to check its status.");
+				answer.append("Your clip has been taken into account. You can visit our <a href='" + postUrl
+						+ "'>forum</a> to check its status.");
 				logger.info(postUrl);
 			} catch (Exception e) {
 				logger.error(e);
@@ -277,7 +276,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 			}
 		}
 		try {
-			SendMessage message = new SendMessage().setChatId(chatId).setText(answer.toString()).setParseMode(ParseMode.HTML);
+			SendMessage message = new SendMessage().setChatId(chatId).setText(answer.toString())
+					.setParseMode(ParseMode.HTML);
 			execute(message);
 		} catch (TelegramApiException e) {
 			logger.error(e);
@@ -286,13 +286,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	public String createTopic(TelegramUser user, String url, String forumApiKey) throws Exception {
-		int categoryId = YOUTUBE_CAMPAIGN_ID;
 		final String title = user.getFirstName() + "'s promotional video";
 		final String content = "This is my video. Waiting for your reaction...\\n" + url;
 
 		String topicLink = "Error creating automated post";
 		try {
-			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(), categoryId, title, content, forumApiKey);
+			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(),
+					VideoRegistrationService.WELCOME_XHUMANITY_CAMPAIGN_ID, title, content, forumApiKey);
 			topicLink = topic.getURL();
 		} catch (Exception e) {
 			logger.error(e);

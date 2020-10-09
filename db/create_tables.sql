@@ -44,7 +44,7 @@ DROP TABLE IF EXISTS instagram_insight_comment;
 CREATE TABLE instagram_insight_comment (
   id INT NOT NULL AUTO_INCREMENT,
   insight_id INT NOT NULL DEFAULT 0,
-  comment_id INT DEFAULT 0,
+  comment_id BIGINT DEFAULT 0,
   message VARCHAR(5000) DEFAULT '',
   creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)

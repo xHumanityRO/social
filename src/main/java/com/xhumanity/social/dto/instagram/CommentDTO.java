@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class CommentDTO {
 
-	private Integer commentId;
+	private Long commentId;
 	private String message;
 }
