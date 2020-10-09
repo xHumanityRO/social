@@ -1,5 +1,7 @@
 package com.xhumanity.social.service;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +13,7 @@ import com.xhumanity.social.dto.instagram.CommentDTO;
 import com.xhumanity.social.dto.instagram.InsightDTO;
 import com.xhumanity.social.model.InstagramInsight;
 import com.xhumanity.social.model.InstagramInsightComment;
+import com.xhumanity.social.projection.ReputationProjection;
 import com.xhumanity.social.repository.InstagramInsightCommentRepository;
 import com.xhumanity.social.repository.InstagramInsightRepository;
 
@@ -44,4 +47,7 @@ public class InstagramService {
 		}
 	}
 
+	public List<ReputationProjection> getReputation(Integer forumUserId) {
+		return insightRepository.getReputation(forumUserId);
+	}
 }

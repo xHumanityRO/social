@@ -23,15 +23,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.xhumanity.social.dto.instagram.AuthenticationDTO;
 import com.xhumanity.social.dto.instagram.InsightDTO;
 import com.xhumanity.social.dto.instagram.InstagramMediaDTO;
+import com.xhumanity.social.dto.instagram.ReputationHistoryDTO;
+import com.xhumanity.social.dto.instagram.ReputationHistoryItemDTO;
 import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
+import com.xhumanity.social.projection.ReputationProjection;
 import com.xhumanity.social.repository.CampaignVideoRepository;
 import com.xhumanity.social.repository.TelegramUserRepository;
 import com.xhumanity.social.service.InstagramService;
 import com.xhumanity.social.service.VideoRegistrationService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Controller
 @RequestMapping("/")
+@Slf4j
 public class InstagramController {
 
 	private static final Logger logger = LogManager.getLogger(InstagramController.class);
@@ -192,5 +198,39 @@ public class InstagramController {
 		}
 
 		return media;
+	}
+
+	@GetMapping("/instagram/reputation/{forumUserId}")
+	public @ResponseBody ReputationHistoryDTO userReputation(@RequestHeader("xhs-apikey") final String apiKey,
+			@PathVariable("forumUserId") final Integer forumUserId) throws IllegalAccessException {
+		if (!xhumanityApiKey.equals(apiKey)) {
+			throw new IllegalAccessException();
+		}
+		if (forumUserId == null) {
+			logger.info("forum user ID not specified");
+			throw new IllegalArgumentException("forumUserId not specified");
+		}
+
+		ReputationHistoryDTO reputationHistory = null;
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
+		if (telegramUser.isPresent()) {
+			try {
+				List<ReputationHistoryItemDTO> items = new ArrayList<>();
+				reputationHistory = ReputationHistoryDTO.builder().forumUserId(forumUserId)
+						.forumUsername(telegramUser.get().getForumUsername()).data(items).build();
+				List<ReputationProjection> history = instagramService.getReputation(forumUserId);
+				history.forEach(h -> {
+					items.add(ReputationHistoryItemDTO.builder().timestamp(h.getDay().getTime())
+							.reputation(h.getReputation()).build());
+				});
+			} catch (Exception e) {
+				log.error("Exception occured", e);
+				throw e;
+			}
+		} else {
+			logger.info("user not found: " + forumUserId);
+			throw new EntityNotFoundException("User not found");
+		}
+		return reputationHistory;
 	}
 }
