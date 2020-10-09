@@ -52,7 +52,8 @@ public class InstagramController {
 
 	@PostMapping(path = "/instagram", consumes = "application/json", produces = "application/json")
 	public @ResponseBody AuthenticationDTO auth(@RequestHeader("xhs-apikey") String apiKey,
-			@RequestBody AuthenticationDTO auth) throws IllegalAccessException, MissingServletRequestParameterException {
+			@RequestBody AuthenticationDTO auth)
+			throws IllegalAccessException, MissingServletRequestParameterException {
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
 		}
@@ -62,7 +63,7 @@ public class InstagramController {
 		if (auth.getToken() == null || "".equals(auth.getToken())) {
 			throw new MissingServletRequestParameterException("token", "String");
 		}
-		
+
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(auth.getForumUserId());
 		if (telegramUser.isPresent()) {
 			TelegramUser user = telegramUser.get();
@@ -78,7 +79,8 @@ public class InstagramController {
 
 	@PostMapping(path = "/instagram/media", consumes = "application/json", produces = "application/json")
 	public @ResponseBody InstagramMediaDTO registration(@RequestHeader("xhs-apikey") String apiKey,
-			@RequestBody InstagramMediaDTO media) throws IllegalAccessException, MissingServletRequestParameterException {
+			@RequestBody InstagramMediaDTO media)
+			throws IllegalAccessException, MissingServletRequestParameterException {
 
 		String mediaUrl = media.getMediaUrl();
 
@@ -95,7 +97,7 @@ public class InstagramController {
 		if (campaignVideoRepository.findByLink(media.getMediaUrl()).isPresent()) {
 			throw new IllegalArgumentException("Media already registered");
 		}
-		
+
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(media.getForumUserId());
 		if (telegramUser.isPresent()) {
 			try {
@@ -151,12 +153,14 @@ public class InstagramController {
 			Optional<TelegramUser> telegramUser = telegramUserRepository.findById(campaignVideo.getUserId());
 			Integer forumUserId = null;
 			String instaUserId = null;
+			String token = null;
 			if (telegramUser.isPresent()) {
 				instaUserId = telegramUser.get().getInstaUserId();
 				forumUserId = telegramUser.get().getForumUserId();
+				token = telegramUser.get().getInstaAccessToken();
 			}
 			media.add(InstagramMediaDTO.builder().userId(instaUserId).forumUserId(forumUserId)
-					.mediaUrl(campaignVideo.getLink()).mediaId(campaignVideo.getEntityId()).build());
+					.mediaUrl(campaignVideo.getLink()).mediaId(campaignVideo.getEntityId()).token(token).build());
 		}
 		return media;
 	}

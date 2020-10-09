@@ -12,6 +12,7 @@ import lombok.ToString;
 public class InstagramMediaDTO {
 	private Integer forumUserId;
 	private String userId;
+	private String token;
 	private String mediaId;
 	private String mediaUrl;
 	@JsonIgnore

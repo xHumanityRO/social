@@ -46,5 +46,6 @@ CREATE TABLE instagram_insight_comment (
   insight_id INT NOT NULL DEFAULT 0,
   comment_id INT DEFAULT 0,
   message VARCHAR(5000) DEFAULT '',
+  creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;

@@ -1,7 +1,5 @@
 package com.xhumanity.social.service;
 
-import java.util.Optional;
-
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,12 +26,9 @@ public class InstagramService {
 
 	public void saveInsights(InsightDTO insightDto) throws InternalError {
 		try {
-			Optional<InstagramInsight> insightOpt = insightRepository.findByMediaUrl(insightDto.getMediaUrl());
-			InstagramInsight insight = insightOpt.orElse(InstagramInsight.builder().build());
-			insight.setMediaUrl(insightDto.getMediaUrl());
-			insight.setLikes(insightDto.getLikes());
-			insight.setDislikes(insightDto.getDislikes());
-			
+			InstagramInsight insight = InstagramInsight.builder().mediaUrl(insightDto.getMediaUrl())
+					.likes(insightDto.getLikes()).dislikes(insightDto.getDislikes()).build();
+
 			insight = insightRepository.save(insight);
 
 			insightCommentRepository.deleteAllByInsightId(insight.getId());
