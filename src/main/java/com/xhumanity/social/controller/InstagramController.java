@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.xhumanity.social.dto.instagram.AuthenticationDTO;
 import com.xhumanity.social.dto.instagram.InsightDTO;
@@ -50,33 +50,19 @@ public class InstagramController {
 	@Autowired
 	private CampaignVideoRepository campaignVideoRepository;
 
-	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Exception occured while processing...")
-	@ExceptionHandler
-	void onInternalError(final InternalError ex) {
-
-	}
-
-	@ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Invalid authorization key")
-	@ExceptionHandler
-	void onIllegalAccessException(final IllegalAccessException ex) {
-
-	}
-
-	@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Some parameters are invalid")
-	@ExceptionHandler
-	void onIllegalArgumentException(final IllegalArgumentException ex) {
-
-	}
-
 	@PostMapping(path = "/instagram", consumes = "application/json", produces = "application/json")
 	public @ResponseBody AuthenticationDTO auth(@RequestHeader("xhs-apikey") String apiKey,
-			@RequestBody AuthenticationDTO auth) throws IllegalAccessException {
+			@RequestBody AuthenticationDTO auth) throws IllegalAccessException, MissingServletRequestParameterException {
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
 		}
-		if (auth == null || auth.getUserId() == null || auth.getToken() == null || "".equals(auth.getToken())) {
-			throw new InternalError();
+		if (auth == null || auth.getUserId() == null || "".equals(auth.getUserId())) {
+			throw new MissingServletRequestParameterException("userId", "String");
 		}
+		if (auth.getToken() == null || "".equals(auth.getToken())) {
+			throw new MissingServletRequestParameterException("token", "String");
+		}
+		
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(auth.getForumUserId());
 		if (telegramUser.isPresent()) {
 			TelegramUser user = telegramUser.get();
@@ -85,26 +71,29 @@ public class InstagramController {
 			telegramUserRepository.save(user);
 		} else {
 			logger.info("user not found: " + auth.getForumUserId());
-			throw new IllegalArgumentException();
+			throw new EntityNotFoundException("User not found");
 		}
 		return auth;
 	}
 
 	@PostMapping(path = "/instagram/media", consumes = "application/json", produces = "application/json")
 	public @ResponseBody InstagramMediaDTO registration(@RequestHeader("xhs-apikey") String apiKey,
-			@RequestBody InstagramMediaDTO media) throws IllegalAccessException {
+			@RequestBody InstagramMediaDTO media) throws IllegalAccessException, MissingServletRequestParameterException {
 
 		String mediaUrl = media.getMediaUrl();
 
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
 		}
+		if (media == null || media.getForumUserId() == null) {
+			throw new MissingServletRequestParameterException("forumUserId", "String");
+		}
 		if (mediaUrl == null || "".equals(mediaUrl)) {
 			logger.info("mediaUrl is empty");
-			throw new IllegalArgumentException();
+			throw new MissingServletRequestParameterException("mediaUrl", "String");
 		}
 		if (campaignVideoRepository.findByLink(media.getMediaUrl()).isPresent()) {
-			throw new InternalError();
+			throw new IllegalArgumentException("Media already registered");
 		}
 		
 		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(media.getForumUserId());
@@ -118,18 +107,22 @@ public class InstagramController {
 			}
 		} else {
 			logger.info("user not found: " + media.getForumUserId());
-			throw new IllegalArgumentException();
+			throw new EntityNotFoundException("User not found");
 		}
 		return media;
 	}
 
 	@PostMapping(path = "/instagram/insights", consumes = "application/json", produces = "application/json")
 	public @ResponseBody InsightDTO insights(@RequestHeader("xhs-apikey") String apiKey,
-			@RequestBody InsightDTO insight) throws IllegalAccessException {
+			@RequestBody InsightDTO insight) throws IllegalAccessException, MissingServletRequestParameterException {
 		if (!xhumanityApiKey.equals(apiKey)) {
 			throw new IllegalAccessException();
 		}
 
+		if (insight.getMediaUrl() == null || "".equals(insight.getMediaUrl())) {
+			logger.info("mediaUrl is empty");
+			throw new MissingServletRequestParameterException("mediaUrl", "String");
+		}
 		Optional<CampaignVideo> media = campaignVideoRepository.findByLink(insight.getMediaUrl());
 		if (!media.isPresent()) {
 			throw new IllegalArgumentException();
@@ -140,7 +133,7 @@ public class InstagramController {
 			instagramService.saveInsights(insight);
 		} else {
 			logger.info("media url not found: " + insight.getMediaUrl());
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Media url not found");
 		}
 		return insight;
 	}
@@ -176,7 +169,7 @@ public class InstagramController {
 		}
 		if (forumUserId == null) {
 			logger.info("forum user ID not specified");
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("forumUserId not specified");
 		}
 
 		List<InstagramMediaDTO> media = new ArrayList<>();
@@ -191,7 +184,7 @@ public class InstagramController {
 			}
 		} else {
 			logger.info("user not found: " + forumUserId);
-			throw new IllegalArgumentException();
+			throw new EntityNotFoundException("User not found");
 		}
 
 		return media;
