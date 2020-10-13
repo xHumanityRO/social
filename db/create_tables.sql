@@ -28,6 +28,7 @@ CREATE TABLE campaign_video (
   link VARCHAR(500) DEFAULT '',
   entity_id VARCHAR(50) DEFAULT '',
   post_url VARCHAR(500) DEFAULT '',
+  creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
@@ -37,6 +38,7 @@ CREATE TABLE instagram_insight (
   media_url VARCHAR(500) DEFAULT '',
   likes INT DEFAULT 0,
   dislikes INT DEFAULT 0,
+  creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
