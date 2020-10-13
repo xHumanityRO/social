@@ -1,0 +1,26 @@
+<html xmlns:th="www.thymeleaf.org">
+
+<head>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <title>Stats</title>
+</head>
+<body>
+    <div class="container">
+
+        <h3 class="mt-5">Welcome, <span th:text="${userProfile.firstName}"></span>!</h3>
+
+        <h4 class="mt-5">Your post Stats:</h4>
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <b class="lead" th:text="${likes}">from</b> likes
+                <b class="lead" th:text="${dislikes}">from</b> dislikes
+                <b class="lead" th:text="${comments}">from</b> comments
+                <p class="lead"><img th:if="${picture}" th:src="${picture}" class="img-thumbnail"/></p>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -55,6 +55,20 @@ public class FBOperationsController {
 		return viewName;
     }
 	
+	@GetMapping("/insights/{forumUserId}")
+    public String insights(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
+		String viewName = "signup";
+		try {
+			facebookService.getInsights(model, forumUserId);
+			viewName = "insights";
+		} catch(InvalidAuthorizationException ex) {
+			
+		} catch(ExpiredAuthorizationException ex) {
+			
+		}
+		return viewName;
+    }
+	
 	@GetMapping("/feed/{forumUserId}")
     public @ResponseBody FeedDTO feed(Model model, @PathVariable(value = "forumUserId") Integer forumUserId) {
 		return facebookService.getFeed(model, forumUserId);

@@ -1,6 +1,7 @@
 package com.xhumanity.social.service;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.Page;
 import org.springframework.social.facebook.api.PagedList;
@@ -20,10 +22,17 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xhumanity.social.dto.CampaignVideoDTO;
 import com.xhumanity.social.dto.facebook.FeedDTO;
+import com.xhumanity.social.dto.facebook.InsightDTO;
 import com.xhumanity.social.dto.facebook.PostDTO;
+import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.model.CampaignVideo;
 import com.xhumanity.social.model.TelegramUser;
 import com.xhumanity.social.repository.TelegramUserRepository;
@@ -113,6 +122,36 @@ public class FacebookService {
 			model.addAttribute("userFeed", userFeed);
 		});
 		return "feed";
+	}
+
+	public String getInsights(Model model, Integer forumUserId) {
+		Optional<TelegramUser> telegramUser = telegramUserRepository.findByForumUserId(forumUserId);
+		telegramUser.ifPresent(u -> {
+			Facebook facebook = new FacebookTemplate(u.getFbAccessToken());
+
+			User userProfile = facebook.fetchObject(FacebookUtils.LOGGED_USER_ID, User.class,
+					FacebookUtils.USER_FIELD_ID, FacebookUtils.USER_FIELD_EMAIL, FacebookUtils.USER_FIELD_FIRST_NAME,
+					FacebookUtils.USER_FIELD_LAST_NAME);
+			model.addAttribute("userProfile", userProfile);
+			
+			RestTemplate restTemplate = new RestTemplate();
+		     
+			try {
+				final String baseUrl = "https://graph.facebook.com/v2.8/3418160981537358_3510908308929291?fields=shares,reactions,comments.summary(true)&access_token=" + u.getFbAccessToken();
+				URI uri = new URI(baseUrl);
+				 
+				ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+				InsightDTO insight = new ObjectMapper().readValue(result.getBody(), InsightDTO.class);
+				
+				model.addAttribute("likes", insight.getReactions().getData().size());
+				model.addAttribute("dislikes", "0");
+				model.addAttribute("comments", insight.getComments().getData().size());
+				model.addAttribute("picture", "https://scontent-otp1-1.xx.fbcdn.net/v/t1.0-0/s130x130/120848431_3510907702262685_7970974661646936809_n.jpg?_nc_cat=106&_nc_sid=8024bb&_nc_ohc=f-kYozOIRrcAX8Zxzwf&_nc_ht=scontent-otp1-1.xx&tp=7&oh=e1c56e110629fbf054730eb1d6d7cf87&oe=5F9DE34B");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		return "insights";
 	}
 
 	public FeedDTO getFeed(Model model, Integer forumUserId) {
