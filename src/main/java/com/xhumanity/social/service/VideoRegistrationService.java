@@ -18,13 +18,18 @@ public class VideoRegistrationService {
 
 	private static final int PROMO_TOPIC_ID = 11100297;
 	public static final int WELCOME_XHUMANITY_CAMPAIGN_ID = 827617;
+	public static final int TEST_CATEGORY_ID = 827618;
 	private static final int YOUTUBE_CAMPAIGN_ID = 1;
 
 	@Autowired
 	private CampaignVideoRepository campaignVideoRepository;
 	
 	public CampaignVideoDTO register(TelegramUser user, String videoUrl, String mediaId, String forumApiKey, String source) throws Exception {
-		String postLink = createPost(user, videoUrl, forumApiKey);
+		int categoryId = TEST_CATEGORY_ID;
+		if (CampaignVideo.SOURCE_YOUTUBE.equals(source)) {
+			categoryId = WELCOME_XHUMANITY_CAMPAIGN_ID;
+		}
+		String postLink = createTopic(user, videoUrl, forumApiKey, categoryId);
 		campaignVideoRepository.save(CampaignVideo.builder()
 				.campaignId(YOUTUBE_CAMPAIGN_ID)
 				.source(source)
@@ -37,13 +42,13 @@ public class VideoRegistrationService {
 		return CampaignVideoDTO.builder().postUrl(postLink).videoUrl(videoUrl).userId(user.getForumUserId()).build();
 	}
 
-	private String createPost(TelegramUser user, String url, String forumApiKey) {
+	private String createTopic(TelegramUser user, String url, String forumApiKey, int campaignId) {
 		final String subject = user.getFirstName() + "'s promotional video";
 		final String message = "This is my video. Waiting for your reaction...\\n" + url;
 
 		String postLink = "Error creating automated post";
 		try {
-			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(), WELCOME_XHUMANITY_CAMPAIGN_ID, subject, message, forumApiKey);
+			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(), campaignId, subject, message, forumApiKey);
 			postLink = topic.getURL();
 		} catch (Exception e) {
 			logger.error(e);
