@@ -38,7 +38,7 @@ public class FBAuthController {
 			@RequestParam("code") String code) throws URISyntaxException, IOException {
 		facebookService.createFacebookAccessToken(forumUserId, code);
 		RedirectView redirectView = new RedirectView();
-		redirectView.setUrl("https://webapp.xhumanity.org/social/posts/" + forumUserId);
+		redirectView.setUrl("https://webapp.xhumanity.org/socialweb/?user=" + forumUserId);
 		return redirectView;
 	}
 

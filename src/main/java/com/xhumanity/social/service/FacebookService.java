@@ -54,7 +54,7 @@ public class FacebookService {
 		OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 		OAuth2Parameters params = new OAuth2Parameters();
 		params.setRedirectUri("https://webapp.xhumanity.org/social/facebook");
-		params.setScope("public_profile,email,user_birthday,user_posts,read_insights");
+		params.setScope("public_profile,email,user_posts,read_insights");
 		params.setState(String.valueOf(forumUserId));
 		return oauthOperations.buildAuthorizeUrl(params);
 	}
@@ -143,7 +143,7 @@ public class FacebookService {
 //			for (Comment comment : comments) {
 //				logger.info("comment: " + comment.getMessage());
 //			}
-			//3418160981537358_3510908308929291?fields=shares,reactions,comments.summary(true)
+			//https://graph.facebook.com/v2.8/3418160981537358_3510908308929291?fields=shares,reactions,comments.summary(true)&access_token=XXXYYY
 			model.addAttribute("userFeed", userFeed);
 		});
 		return feed;
