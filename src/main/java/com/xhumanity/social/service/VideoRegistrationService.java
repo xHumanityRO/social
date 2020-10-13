@@ -18,7 +18,7 @@ public class VideoRegistrationService {
 
 	private static final int PROMO_TOPIC_ID = 11100297;
 	public static final int WELCOME_XHUMANITY_CAMPAIGN_ID = 827617;
-	public static final int TEST_CATEGORY_ID = 827618;
+	public static final int TEST_CATEGORY_ID = 830956;
 	private static final int YOUTUBE_CAMPAIGN_ID = 1;
 
 	@Autowired
