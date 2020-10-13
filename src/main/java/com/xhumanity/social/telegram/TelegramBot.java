@@ -27,7 +27,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.xhumanity.social.dto.CampaignVideoDTO;
-import com.xhumanity.social.dto.forum.TopicDTO;
 import com.xhumanity.social.dto.forum.UserDTO;
 import com.xhumanity.social.exception.IntegrationException;
 import com.xhumanity.social.model.CampaignVideo;
@@ -139,7 +138,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 				telegramUserRepository.save(telegramUser);
 				answer += " Username: " + telegramUser.getForumUsername() + ", Pass: " + password + "\n"
 						+ "To log in please go to <a href='https://forum.xhumanity.org/register/login'>Login</a>\n\n"
-						+ "You can share your YouTube link on this chat directly and we'll do the rest for you...\n\n"
+						+ "You can share your YouTube link on this chat directly and we'll do the rest for you... (your video should contain #" + telegramUser.getForumUsername() + " in title, otherwise it will not be valid)\n\n"
 						+ "For a better experience within our comunity /share_phone_number with us. This is optional.";
 			} catch (IntegrationException e) {
 				answer = e.getMessage();
@@ -259,17 +258,26 @@ public class TelegramBot extends TelegramLongPollingBot {
 			try {
 				VideoListResponse response = YoutubeUtils.getVideoDetails(videoId, youtubeApiKey);
 				logger.info(response);
-			} catch (GeneralSecurityException | IOException e) {
-				logger.error(e);
-			}
-
-			try {
+				if (response != null && response.getItems() != null && response.getItems().size() > 0
+						&& response.getItems().get(0) != null && response.getItems().get(0).getSnippet() != null) {
+					String title = response.getItems().get(0).getSnippet().getTitle();
+					if (!title.contains("#" + telegramUser.getForumUsername())) {
+						String errorMessage = "Sorry, we cannot post this for you. We did not find #" + telegramUser.getForumUsername() + " in the title of this video.";
+						throw new UnsupportedOperationException(errorMessage);
+					}
+				}
+				
 				CampaignVideoDTO campaignVideoDTO = videoRegistrationService.register(telegramUser, videoUrl, videoId,
 						forumApiKey, CampaignVideo.SOURCE_YOUTUBE);
 				String postUrl = campaignVideoDTO.getPostUrl();
 				answer.append("Your clip has been taken into account. You can visit our <a href='" + postUrl
 						+ "'>forum</a> to check its status.");
 				logger.info(postUrl);
+
+			} catch (UnsupportedOperationException e) {
+				answer.append(e.getMessage());
+			} catch (GeneralSecurityException | IOException e) {
+				logger.error(e);
 			} catch (Exception e) {
 				logger.error(e);
 				Utils.replace(answer, "Error occurred while processing your link");
@@ -283,21 +291,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 			logger.error(e);
 		}
 		logReceivedMessage(update.getMessage().getChat(), videoUrl, answer.toString());
-	}
-
-	public String createTopic(TelegramUser user, String url, String forumApiKey) throws Exception {
-		final String title = user.getFirstName() + "'s promotional video";
-		final String content = "This is my video. Waiting for your reaction...\\n" + url;
-
-		String topicLink = "Error creating automated post";
-		try {
-			TopicDTO topic = ForumUtils.createTopic(user.getForumUsername(),
-					VideoRegistrationService.WELCOME_XHUMANITY_CAMPAIGN_ID, title, content, forumApiKey);
-			topicLink = topic.getURL();
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		return topicLink;
 	}
 
 	private void processEmailAddress(Update update, TelegramUser telegramUser, long chatId, String email) {
